@@ -1,0 +1,17 @@
+class Solution {
+    public int maxDistinctElements(int[] nums, int k) {
+        Arrays.sort(nums);
+        long lastAssigned = Long.MIN_VALUE;
+        int res = 0;
+        for (int num : nums) {
+            long lower = (long) num - k;
+            long upper = (long) num + k;
+            long candidate = Math.max(lastAssigned + 1, lower);
+            if (candidate <= upper) {
+                res++;
+                lastAssigned = candidate;
+            }
+        }
+        return res;
+    }
+}
