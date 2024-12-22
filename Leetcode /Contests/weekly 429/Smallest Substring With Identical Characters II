@@ -1,0 +1,31 @@
+class Solution {
+    public int minLength(String s, int numOps) {
+        int temp = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) - '0' == i % 2) temp++;
+        }
+        if (temp <= numOps || s.length() - temp <= numOps) return 1;
+        ArrayList<Integer> arr = new ArrayList<>();
+        int count = 1;
+        for (int i = 1; i < s.length(); i++) {
+            if (s.charAt(i) == s.charAt(i - 1)) count++;
+            else {
+                arr.add(count);
+                count = 1;
+            }
+        }
+        arr.add(count);
+        int l = 2;
+        int r = s.length();
+        while (l < r) {
+            int mid = (l + r) / 2;
+            int sum = 0;
+            for (int i : arr) {
+                sum += i / (mid + 1);
+            }
+            if (sum <= numOps) r = mid;
+            else l = mid + 1;
+        }
+        return l;
+    }
+}
