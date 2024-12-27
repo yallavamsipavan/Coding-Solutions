@@ -1,0 +1,27 @@
+class Solution {
+    public int countPathsWithXorValue(int[][] grid, int k) {
+        int mod = 1_000_000_007;
+        int m = grid.length;
+        int n = grid[0].length;
+        int dp[][][] = new int[m][n][16];
+        dp[0][0][grid[0][0]] = 1;
+        int last = grid[0][0];
+        for (int i = 1; i < m; i++) {
+            last ^= grid[i][0];
+            dp[i][0][last] = 1;
+        }
+        last = grid[0][0];
+        for (int i = 1; i < n; i++) {
+            last ^= grid[0][i];
+            dp[0][i][last] = 1;
+        }
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                for (int l = 0; l < 16; l++) {
+                    dp[i][j][l ^ grid[i][j]] = (dp[i-1][j][l] + dp[i][j-1][l])%mod;
+                }
+            }
+        }
+        return dp[m-1][n-1][k];
+    }
+}
