@@ -1,0 +1,62 @@
+class Solution {
+    public int subsequencesWithMiddleMode(int[] nums) {
+        int n = nums.length;
+        final int mod = 1_000_000_007;
+        Map<Integer, Long> pref = new HashMap<>();
+        Map<Integer, Long> suff = new HashMap<>();
+        Map<Integer, Long> pf = new HashMap<>();
+
+        for (int num : nums) {
+            suff.put(num, suff.getOrDefault(num, 0L) + 1);
+        }
+
+        long[] nC2 = new long[n + 1];
+        for (int i = 1; i <= n; i++) {
+            nC2[i] = nC2[i - 1] + (i - 1);
+        }
+
+        long sum1 = 0;
+        long sum2 = 0;
+        for (long cnt : suff.values()) {
+            sum2 += nC2[(int) cnt];
+        }
+        long sum3 = 0;
+        long sum4 = 0;
+        long sum5 = 0;
+
+        long res = 0;
+        for (int i = 0; i < n; i++) {
+            int mid = nums[i];
+
+            sum1 -= nC2[pref.getOrDefault(mid, 0L).intValue()];
+            sum2 -= nC2[suff.getOrDefault(mid, 0L).intValue()];
+            sum3 -= pf.getOrDefault(mid, 0L);
+            sum4 -= pf.getOrDefault(mid, 0L) * pref.getOrDefault(mid, 0L);
+            sum5 -= pf.getOrDefault(mid, 0L) * suff.getOrDefault(mid, 0L);
+
+            suff.put(mid, suff.get(mid) - 1);
+            long l = i - pref.getOrDefault(mid, 0L);
+            long r = n - i - 1 - suff.getOrDefault(mid, 0L);
+
+            res += pref.getOrDefault(mid, 0L) * l * (nC2[n - i - 1] - sum2)
+                    + (nC2[i] - sum1) * r * suff.getOrDefault(mid, 0L);
+            res -= (pref.getOrDefault(mid, 0L) * r + l * suff.getOrDefault(mid, 0L)) * sum3;
+            res += pref.getOrDefault(mid, 0L) * sum5 + sum4 * suff.getOrDefault(mid, 0L);
+            res += (nC2[pref.getOrDefault(mid, 0L).intValue()] + nC2[(int) l] - nC2[i]) * nC2[n - i - 1];
+            res += nC2[i] * (nC2[suff.getOrDefault(mid, 0L).intValue()] + nC2[(int) r]);
+            res -= nC2[(int) l] * nC2[(int) r];
+
+            res %= mod;
+
+            pf.put(mid, pf.getOrDefault(mid, 0L) - pref.getOrDefault(mid, 0L) + suff.getOrDefault(mid, 0L));
+            pref.put(mid, pref.getOrDefault(mid, 0L) + 1);
+
+            sum1 += nC2[pref.get(mid).intValue()];
+            sum2 += nC2[suff.get(mid).intValue()];
+            sum3 += pf.get(mid);
+            sum4 += pf.get(mid) * pref.get(mid);
+            sum5 += pf.get(mid) * suff.get(mid);
+        }
+        return (int) (res % mod);
+    }
+}
